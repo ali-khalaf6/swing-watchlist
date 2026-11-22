@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swing Watchlist</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--ink:#14171c;--muted:#5d6673;--line:#e3e6ea;--accent:#1f4fd1;
+  --win:#137a3a;--win-bg:#e3f4e8;--loss:#b42318;--loss-bg:#fde8e6;--open:#8a5a00;--open-bg:#fff3d6;--na:#6b7280;--na-bg:#eef0f3;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1216;--card:#171b21;--ink:#e8ebef;--muted:#9aa4b2;--line:#2a313a;--accent:#7aa2ff;
+  --win:#5fd38d;--win-bg:#123221;--loss:#ff8a7e;--loss-bg:#3a1714;--open:#f3c164;--open-bg:#3a2c0e;--na:#a0a8b4;--na-bg:#232931;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:18px;margin:0 0 12px}
+h3{font-size:15px;margin:18px 0 8px}
+.sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:0 0 16px}
+.market{display:flex;flex-wrap:wrap;gap:10px 28px}
+.market div b{display:block;font-size:20px}
+.market div span{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:999px;cursor:pointer;font:inherit}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab small{opacity:.8}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+th:first-child,td:first-child{text-align:left}
+td .nm{display:block;color:var(--muted);font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.scroll{overflow-x:auto}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+.TARGET{color:var(--win);background:var(--win-bg)}
+.STOP{color:var(--loss);background:var(--loss-bg)}
+.OPEN,.PENDING{color:var(--open);background:var(--open-bg)}
+.TIME,.NOT_FILLED,.SKIPPED{color:var(--na);background:var(--na-bg)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:12px}
+.kpi b{display:block;font-size:22px}
+.kpi span{color:var(--muted);font-size:13px}
+.pos{color:var(--win)}.neg{color:var(--loss)}
+.note{color:var(--muted);font-size:13px}
+.empty{padding:14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted)}
+ul{padding-left:20px;margin:6px 0}
+li{margin:4px 0}
+.how{background:var(--bg);border-radius:10px;padding:12px 14px;margin-top:12px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Swing Watchlist</h1>
+  <p class="sub">S&amp;P 500 stocks &amp; major ETFs · long only · buy-the-dip on market pullbacks · trades last up to 10 trading days</p>
+
+  <div class="card" id="market"><span class="note">Loading…</span></div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="panel"></div>
+
+  <div class="card">
+    <h2>How it works</h2>
+    <ul>
+      <li><b>When:</b> the scan runs after every US close (about 00:30 Bahrain time) and lists picks for the <b>next</b> session. Picks only appear on days the whole market dips, so many days have none. That is the strategy working as designed.</li>
+      <li><b>Entry:</b> a <b>limit buy</b> at the listed price, good for the next session only. If it doesn't fill that day, the trade is cancelled.</li>
+      <li><b>If it fills at the open below your limit:</b> keep the same dollar distances. Set the stop and target from your actual fill price, using the risk/reward amounts shown.</li>
+      <li><b>Exit:</b> stop loss or take profit, whichever comes first. If neither is hit after 10 trading days, sell at that day's close.</li>
+      <li><b>Picks:</b> up to 5 a day per strategy, most oversold first, and never a stock that already has an open trade.</li>
+    </ul>
+    <h3>Backtest notes</h3>
+    <ul class="note">
+      <li>Prices: Yahoo Finance daily bars, about 10 years. Each strategy was designed on 2017–2022 data and checked on 2023 onward ("validation").</li>
+      <li>Grading is conservative. If the stop and target are both touched on one day, it counts as a stop. A target on the fill day doesn't count if the fill was intraday. A gap through the stop exits at the open. Every entry includes 0.05% slippage.</li>
+      <li>Random-pick check, same rules but random stocks (Oct 2026): 1.5:1 trades won about 41% (profit factor 1.03), and 2:1 trades won about 33.5% (profit factor 0.97). The strategies' edge is the gap above those numbers.</li>
+      <li>The universe is <i>today's</i> S&amp;P 500, so stocks that dropped out of the index in the past are missing. This flatters the backtest a little.</li>
+      <li>Past results don't guarantee future results. This page is a mechanical screen, not financial advice.</li>
+    </ul>
+  </div>
+  <p class="note" id="foot"></p>
+</div>
+
+<script>
+const fmt=(v,d=2)=>v==null||isNaN(v)?'–':Number(v).toFixed(d);
+const pct=(v,d=1)=>v==null||isNaN(v)?'–':(v*100).toFixed(d)+'%';
+const spct=(v,d=1)=>v==null||isNaN(v)?'–':((v>0?'+':'')+(v*100).toFixed(d)+'%');
+const sR=v=>v==null||isNaN(v)?'–':((v>0?'+':'')+v.toFixed(2)+'R');
+const cls=v=>v>0?'pos':v<0?'neg':'';
+const LABEL={TARGET:'Take profit',STOP:'Stop loss',OPEN:'Open',PENDING:'Waiting for entry day',NOT_FILLED:'Entry not reached',TIME:'10-day exit',SKIPPED:'Skipped'};
+const ORDER=['C','A'];
+let L,B,DM,cur=localStorageGet()||'C';
+function localStorageGet(){try{return localStorage.getItem('sw_tab')}catch(e){return null}}
+function localStorageSet(v){try{localStorage.setItem('sw_tab',v)}catch(e){}}
+
+async function j(p){const r=await fetch(p+'?v='+Date.now());if(!r.ok)throw new Error(p);return r.json();}
+
+function nextSession(d){const x=new Date(d+'T12:00:00Z');do{x.setUTCDate(x.getUTCDate()+1)}while([0,6].includes(x.getUTCDay()));return x.toISOString().slice(0,10);}
+
+function renderMarket(){
+  const m=L.market;
+  document.getElementById('market').innerHTML=`<div class="market">
+   <div><span>Signal date (last close)</span><b>${L.signal_date}</b></div>
+   <div><span>Picks are for</span><b>${nextSession(L.signal_date)}</b></div>
+   <div><span>S&amp;P 500 (SPY)</span><b>${fmt(m.spy_close)}</b></div>
+   <div><span>SPY RSI(2) · dip if under 20</span><b class="${m.spy_rsi2<20?'neg':''}">${fmt(m.spy_rsi2,1)}</b></div>
+   <div><span>SPY vs 200-day avg</span><b>${m.spy_up200?'Above':'Below'}</b></div></div>`;
+}
+
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=ORDER.map(k=>{const s=B.strategies[k];return `<button class="tab ${k===cur?'on':''}" data-k="${k}">${k}: ${s.name} <small>· ${s.rr}:1</small></button>`}).join('');
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{cur=b.dataset.k;localStorageSet(cur);renderTabs();renderPanel();});
+}
+
+function statKpis(s,rr){
+  const be=1/(1+rr);
+  return `<div class="kpis">
+   <div class="kpi"><span>Trades</span><b>${s.n}</b></div>
+   <div class="kpi"><span>Win rate (hit target)</span><b>${pct(s.win_rate)}</b></div>
+   <div class="kpi"><span>Break-even win rate at ${rr}:1</span><b>${pct(be)}</b></div>
+   <div class="kpi"><span>Profit factor</span><b>${fmt(s.profit_factor)}</b></div>
+   <div class="kpi"><span>Avg result / trade</span><b class="${cls(s.avg_R)}">${sR(s.avg_R)}</b></div>
+   <div class="kpi"><span>Avg days held</span><b>${fmt(s.avg_days,1)}</b></div></div>`;
+}
+
+function renderPanel(){
+  const k=cur,s=B.strategies[k],T=L.strategies[k];
+  const picks=T.picks||[];
+  const ns=nextSession(L.signal_date);
+  let picksHtml;
+  if(!picks.length){
+    picksHtml=`<div class="empty">${T.market_ok?'The market qualified today, but no stock met the rules.':'No picks for '+ns+'. The market-dip condition isn\'t met ('+(k==='C'?'SPY must be above its 200-day average with RSI(2) under 20':'SPY RSI(2) must be under 20')+').'} </div>`;
+  }else{
+    picksHtml=`<div class="scroll"><table><thead><tr><th>Stock</th><th>Last close</th><th>Buy limit</th><th>Stop loss</th><th>Take profit</th><th>Risk $ / %</th><th>Reward $ / %</th></tr></thead><tbody>${
+      picks.map(p=>`<tr><td><b>${p.symbol}</b><span class="nm">${p.name}</span></td><td>${fmt(p.close)}</td><td><b>${fmt(p.entry)}</b></td><td class="neg">${fmt(p.stop)}</td><td class="pos">${fmt(p.target)}</td><td>${fmt(p.entry-p.stop)} / ${fmt(p.risk_pct,1)}%</td><td>${fmt(p.target-p.entry)} / ${fmt(p.reward_pct,1)}%</td></tr>`).join('')
+    }</tbody></table></div><p class="note">Limit orders are for ${ns} only. Cancel any that don't fill.</p>`;
+  }
+
+  const dp=(DM.picks||[]).filter(p=>p.strategy===k).slice().reverse();
+  const res=dp.map(p=>p.result||{});
+  const closed=res.filter(r=>['TARGET','STOP','TIME'].includes(r.status));
+  const w=closed.filter(r=>r.status==='TARGET').length;
+  const totR=closed.reduce((a,r)=>a+(r.R||0),0);
+  const cnt=st=>res.filter(r=>r.status===st).length;
+  const demoHtml=dp.length?`<div class="kpis" style="margin-bottom:12px">
+     <div class="kpi"><span>Picks published</span><b>${dp.length}</b></div>
+     <div class="kpi"><span>Take profit</span><b class="pos">${cnt('TARGET')}</b></div>
+     <div class="kpi"><span>Stop loss</span><b class="neg">${cnt('STOP')}</b></div>
+     <div class="kpi"><span>Open / waiting</span><b>${cnt('OPEN')+cnt('PENDING')}</b></div>
+     <div class="kpi"><span>Entry not reached</span><b>${cnt('NOT_FILLED')}</b></div>
+     <div class="kpi"><span>Win rate · total</span><b>${closed.length?pct(w/closed.length,0):'–'} · <span class="${cls(totR)}">${closed.length?sR(totR):'–'}</span></b></div></div>
+   <div class="scroll"><table><thead><tr><th>Stock</th><th>Signal</th><th>Buy limit</th><th>Stop</th><th>Target</th><th>Status</th><th>Filled</th><th>Exit</th><th>Result</th></tr></thead><tbody>${
+     dp.map(p=>{const r=p.result||{};const live=r.status==='OPEN'?((p.last_price/r.fill)-1):r.ret;return `<tr><td><b>${p.symbol}</b></td><td>${p.signal_date}</td><td>${fmt(p.entry)}</td><td>${fmt(r.stop??p.stop)}</td><td>${fmt(r.target??p.target)}</td><td><span class="pill ${r.status}">${LABEL[r.status]||r.status}</span></td><td>${r.fill?fmt(r.fill)+'<span class="nm">'+r.entry_date+'</span>':'–'}</td><td>${r.status==='OPEN'?'last '+fmt(p.last_price):r.exit?fmt(r.exit)+'<span class="nm">'+r.exit_date+'</span>':'–'}</td><td class="${cls(live)}">${r.fill?spct(live)+(r.status!=='OPEN'?' · '+sR(r.R):''):'–'}</td></tr>`}).join('')
+   }</tbody></table></div>`:`<div class="empty">The live demo started on ${DM.started||'–'}. Picks will appear here once the strategy fires, then get graded every day.</div>`;
+
+  const yrs=Object.entries(s.by_year);
+  const btHtml=`${statKpis(s.all,s.rr)}
+   <h3>Designed on vs. validated on</h3>
+   <div class="scroll"><table><thead><tr><th>Period</th><th>Trades</th><th>Win rate</th><th>Stop rate</th><th>10-day exits</th><th>Profit factor</th><th>Avg / trade</th></tr></thead><tbody>
+   ${[['Design: 2017–2022',s.design],['Validation: 2023 →',s.validation],['All',s.all]].map(([n,x])=>`<tr><td>${n}</td><td>${x.n}</td><td><b>${pct(x.win_rate)}</b></td><td>${pct(x.loss_rate)}</td><td>${pct(x.time_rate)}</td><td>${fmt(x.profit_factor)}</td><td class="${cls(x.avg_R)}">${sR(x.avg_R)}</td></tr>`).join('')}
+   </tbody></table></div>
+   <h3>By year</h3>
+   <div class="scroll"><table><thead><tr><th>Year</th>${yrs.map(([y])=>`<th>${y}</th>`).join('')}</tr></thead><tbody>
+   <tr><td>Trades</td>${yrs.map(([,x])=>`<td>${x.n}</td>`).join('')}</tr>
+   <tr><td>Win rate</td>${yrs.map(([,x])=>`<td>${pct(x.win_rate,0)}</td>`).join('')}</tr>
+   <tr><td>Avg / trade</td>${yrs.map(([,x])=>`<td class="${cls(x.avg_R)}">${sR(x.avg_R)}</td>`).join('')}</tr></tbody></table></div>
+   <h3>Most recent backtest trades</h3>
+   <div class="scroll"><table><thead><tr><th>Stock</th><th>Signal</th><th>Filled</th><th>Stop</th><th>Target</th><th>Outcome</th><th>Exit</th><th>Result</th></tr></thead><tbody>${
+     s.recent.slice(0,20).map(t=>`<tr><td><b>${t.symbol}</b></td><td>${t.signal_date}</td><td>${fmt(t.fill)}</td><td>${fmt(t.stop)}</td><td>${fmt(t.target)}</td><td><span class="pill ${t.status}">${LABEL[t.status]}</span></td><td>${fmt(t.exit)}<span class="nm">${t.exit_date}</span></td><td class="${cls(t.R)}">${spct(t.ret)} · ${sR(t.R)}</td></tr>`).join('')
+   }</tbody></table></div>`;
+
+  document.getElementById('panel').innerHTML=`
+   <div class="card"><h2>${k}: ${s.name} · ${s.rr}:1 reward to risk</h2><p class="note" style="margin-top:-6px">${s.summary.replace(/&/g,'&amp;').replace(/</g,'&lt;')} Stop = ${s.stop_atr}× ATR(14). Entry = limit at close − ${s.entry_atr}× ATR.</p>
+     <h3>Picks for ${ns}</h3>${picksHtml}</div>
+   <div class="card"><h2>Live demo results</h2>${demoHtml}</div>
+   <div class="card"><h2>Backtest: ${B.from} to ${B.to}</h2>${btHtml}</div>`;
+}
+
+(async()=>{
+  try{[L,B,DM]=await Promise.all([j('data/latest.json'),j('data/backtest.json'),j('data/demo.json')]);}
+  catch(e){document.getElementById('market').innerHTML='<b>Waiting for the first scan.</b> <span class="note">The data files appear after the scanner\'s first run.</span>';return;}
+  if(!B.strategies[cur])cur='C';
+  renderMarket();renderTabs();renderPanel();
+  document.getElementById('foot').textContent=`Updated ${new Date(L.generated_at).toLocaleString()} · universe ${B.universe_size} symbols · data: Yahoo Finance via scheduled GitHub Actions scan.`;
+})();
+</script>
+</body>
+</html>
