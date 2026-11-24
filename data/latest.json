@@ -1,10 +1,10 @@
 {
- "generated_at": "2026-11-22T22:01:50+00:00",
- "signal_date": "2026-11-20",
+ "generated_at": "2026-11-24T05:29:48+00:00",
+ "signal_date": "2026-11-23",
  "market": {
-  "spy_close": 689.81,
-  "spy_sma200": 732.76,
-  "spy_rsi2": 0.3,
+  "spy_close": 722.29,
+  "spy_sma200": 732.91,
+  "spy_rsi2": 64.5,
   "spy_up200": false
  },
  "strategies": {
@@ -17,84 +17,8 @@
   "A": {
    "name": "Market-dip RSI(2)",
    "rr": 1.5,
-   "market_ok": true,
-   "picks": [
-    {
-     "symbol": "PKG",
-     "name": "Packaging Corporation of America",
-     "sector": "Materials",
-     "close": 234.18,
-     "entry": 231.07,
-     "stop": 226.41,
-     "target": 238.06,
-     "risk": 4.6604,
-     "risk_pct": 2.02,
-     "reward_pct": 3.03,
-     "rsi2": 0.4,
-     "below_sma5_atr": 1.23,
-     "score": -0.358
-    },
-    {
-     "symbol": "FAST",
-     "name": "Fastenal",
-     "sector": "Industrials",
-     "close": 50.61,
-     "entry": 49.94,
-     "stop": 48.94,
-     "target": 51.45,
-     "risk": 1.0022,
-     "risk_pct": 2.01,
-     "reward_pct": 3.01,
-     "rsi2": 0.4,
-     "below_sma5_atr": 2.04,
-     "score": -0.359
-    },
-    {
-     "symbol": "AMGN",
-     "name": "Amgen",
-     "sector": "Health Care",
-     "close": 435.64,
-     "entry": 429.85,
-     "stop": 421.17,
-     "target": 442.88,
-     "risk": 8.6826,
-     "risk_pct": 2.02,
-     "reward_pct": 3.03,
-     "rsi2": 0.4,
-     "below_sma5_atr": 1.04,
-     "score": -0.363
-    },
-    {
-     "symbol": "PFE",
-     "name": "Pfizer",
-     "sector": "Health Care",
-     "close": 27.4,
-     "entry": 27.06,
-     "stop": 26.56,
-     "target": 27.82,
-     "risk": 0.5046,
-     "risk_pct": 1.86,
-     "reward_pct": 2.8,
-     "rsi2": 0.6,
-     "below_sma5_atr": 0.99,
-     "score": -0.584
-    },
-    {
-     "symbol": "BLK",
-     "name": "BlackRock",
-     "sector": "Financials",
-     "close": 1101.72,
-     "entry": 1085.42,
-     "stop": 1060.96,
-     "target": 1122.1,
-     "risk": 24.4568,
-     "risk_pct": 2.25,
-     "reward_pct": 3.38,
-     "rsi2": 0.6,
-     "below_sma5_atr": 1.7,
-     "score": -0.611
-    }
-   ]
+   "market_ok": false,
+   "picks": []
   }
  }
 }

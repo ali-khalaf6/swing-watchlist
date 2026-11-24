@@ -18,8 +18,10 @@
    "below_sma5_atr": 1.23,
    "score": -0.358,
    "result": {
-    "status": "PENDING"
-   }
+    "status": "NOT_FILLED",
+    "entry_date": "2026-11-23"
+   },
+   "last_price": 237.86
   },
   {
    "strategy": "A",
@@ -38,8 +40,10 @@
    "below_sma5_atr": 2.04,
    "score": -0.359,
    "result": {
-    "status": "PENDING"
-   }
+    "status": "NOT_FILLED",
+    "entry_date": "2026-11-23"
+   },
+   "last_price": 52.06
   },
   {
    "strategy": "A",
@@ -58,8 +62,10 @@
    "below_sma5_atr": 1.04,
    "score": -0.363,
    "result": {
-    "status": "PENDING"
-   }
+    "status": "NOT_FILLED",
+    "entry_date": "2026-11-23"
+   },
+   "last_price": 449.04
   },
   {
    "strategy": "A",
@@ -78,8 +84,10 @@
    "below_sma5_atr": 0.99,
    "score": -0.584,
    "result": {
-    "status": "PENDING"
-   }
+    "status": "NOT_FILLED",
+    "entry_date": "2026-11-23"
+   },
+   "last_price": 27.4
   },
   {
    "strategy": "A",
@@ -98,9 +106,11 @@
    "below_sma5_atr": 1.7,
    "score": -0.611,
    "result": {
-    "status": "PENDING"
-   }
+    "status": "NOT_FILLED",
+    "entry_date": "2026-11-23"
+   },
+   "last_price": 1144.52
   }
  ],
- "updated": "2026-11-22T22:01:50+00:00"
+ "updated": "2026-11-24T05:29:48+00:00"
 }
