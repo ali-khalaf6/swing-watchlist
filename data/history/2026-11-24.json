@@ -1,0 +1,24 @@
+{
+ "generated_at": "2026-11-25T04:32:25+00:00",
+ "signal_date": "2026-11-24",
+ "market": {
+  "spy_close": 718.78,
+  "spy_sma200": 733.04,
+  "spy_rsi2": 56.6,
+  "spy_up200": false
+ },
+ "strategies": {
+  "C": {
+   "name": "Market-dip stretch",
+   "rr": 2.0,
+   "market_ok": false,
+   "picks": []
+  },
+  "A": {
+   "name": "Market-dip RSI(2)",
+   "rr": 1.5,
+   "market_ok": false,
+   "picks": []
+  }
+ }
+}
