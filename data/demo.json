@@ -21,7 +21,7 @@
     "status": "NOT_FILLED",
     "entry_date": "2026-11-23"
    },
-   "last_price": 240.99
+   "last_price": 246.87
   },
   {
    "strategy": "A",
@@ -43,7 +43,7 @@
     "status": "NOT_FILLED",
     "entry_date": "2026-11-23"
    },
-   "last_price": 52.27
+   "last_price": 52.93
   },
   {
    "strategy": "A",
@@ -65,7 +65,7 @@
     "status": "NOT_FILLED",
     "entry_date": "2026-11-23"
    },
-   "last_price": 473.94
+   "last_price": 469.24
   },
   {
    "strategy": "A",
@@ -109,8 +109,8 @@
     "status": "NOT_FILLED",
     "entry_date": "2026-11-23"
    },
-   "last_price": 1146.03
+   "last_price": 1141.86
   }
  ],
- "updated": "2026-11-25T04:32:25+00:00"
+ "updated": "2026-11-26T03:44:25+00:00"
 }
